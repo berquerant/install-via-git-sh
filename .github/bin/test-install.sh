@@ -2,9 +2,9 @@
 
 set -e
 
-. ../../install-via-git.sh
+. "$1" # path/to/install-via.git.sh
 
-repo="git@github.com:berquerant/help-bash.git"
+repo="https://github.com/berquerant/help-bash.git"
 reponame="help-bash"
 
 install() {
@@ -16,4 +16,4 @@ ivg_run "$repo" \
         "$reponame" \
         "main" \
         "" \
-        "install" \
+        "install"
