@@ -2,6 +2,9 @@ name: CI
 
 permissions: read-all
 
+env:
+  TERM: xterm
+
 on:
   push:
     branches:
