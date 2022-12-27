@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    timeout-minutes: 1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Describe Github Event Path
+        run: cat $GITHUB_EVENT_PATH
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Display Bash version
+        run: bash --version
+      - name: Display Git version
+        run: git --version
+      - name: Test
+        run: tests/exec-test.sh
+      - name: Test install
+        run: .github/bin/test-install.sh
