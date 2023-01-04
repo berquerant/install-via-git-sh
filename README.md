@@ -51,7 +51,7 @@ ivg_run "https://github.com/USERNAME/path/to/repo.git" \ # required
 then
 
 1. setup()
-2. git clone https://github.com/USERNAME/path/to/repo.git $IG_WORKD/reponame
+2. git clone https://github.com/USERNAME/path/to/repo.git $IVG_WORKD/reponame
 3. git pull
 4. install()
 

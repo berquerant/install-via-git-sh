@@ -50,7 +50,7 @@
 # then
 #
 # 1. setup()
-# 2. git clone https://github.com/USERNAME/path/to/repo.git $IG_WORKD/reponame
+# 2. git clone https://github.com/USERNAME/path/to/repo.git $IVG_WORKD/reponame
 # 3. git pull
 # 4. install()
 #
@@ -307,5 +307,5 @@ ivg_run() {
         return "$__ivg_on_failure_ret"
     }
 
-    __ivg_setup &&__ivg_install && __ivg_on_success || __ivg_on_failure
+    __ivg_setup && __ivg_install && __ivg_on_success || __ivg_on_failure
 }
