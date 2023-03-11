@@ -28,6 +28,34 @@
 #   GIT:
 #     git command.
 #
+#   IVG_REPOSITORY:
+#     Repository URI to be installed.
+#     The 1st argument of ivg_run() is preferentially referenced.
+#
+#   IVG_REPOSITORY_NAME:
+#     Repository name to be installed.
+#     The 2nd argument of ivg_run() is preferentially referenced.
+#
+#   IVG_BRANCH:
+#     Branch name to be installed.
+#     The 3rd argument of ivg_run() is preferentially referenced.
+#
+#   IVG_SETUP_COMMAND:
+#     Setup command.
+#     The 4th argument of ivg_run() is preferentially referenced.
+#
+#   IVG_INSTALL_COMMAND:
+#     Install command.
+#     The 5th argument of ivg_run() is preferentially referenced.
+#
+#   IVG_ROLLBACK_COMMAND:
+#     Rollback command.
+#     The 6th argument of ivg_run() is preferentially referenced.
+#
+#   IVG_LOCKFILE:
+#     File to save commithash.
+#     The 7th argument of ivg_run() is preferentially referenced.
+#
 # e.g.
 #
 # . install-via-git.sh
@@ -147,13 +175,13 @@ ivg_run() {
     __ivg="ivg_run()"
     __ivg_workd="$(ivg_workd)"
 
-    __ivg_repo="$1"      # required
-    __ivg_reponame="$2"  # required
-    __ivg_branch="${3:-main}"
-    __ivg_setup_cmd="$4"
-    __ivg_install_cmd="$5"
-    __ivg_rollback_cmd="$6"
-    __ivg_lockfile="$7"
+    __ivg_repo="${1:-$IVG_REPOSITORY}" # required
+    __ivg_reponame="${2:-$IVG_REPOSITORY_NAME}" # required
+    __ivg_branch="${3:-${IVG_BRANCH:-main}}"
+    __ivg_setup_cmd="${4:-$IVG_SETUP_COMMAND}"
+    __ivg_install_cmd="${5:-$IVG_INSTALL_COMMAND}"
+    __ivg_rollback_cmd="${6:-$IVG_ROLLBACK_COMMAND}"
+    __ivg_lockfile="${7:-$IVG_LOCKFILE}"
 
     if [ -z "$__ivg_repo" ]; then
         __ivg_error "${__ivg} requires $1 (repo)"
