@@ -63,6 +63,7 @@ is_git_checkout_called() {
 setup_called=0
 install_called=0
 rollback_called=0
+skipped_called=0
 
 setup() {
     echo "setup()"
@@ -75,6 +76,10 @@ install() {
 rollback() {
     echo "rollback()"
     rollback_called=1
+}
+skipped() {
+    echo "skipped()"
+    skipped_called=1
 }
 
 is_setup_called() {
@@ -96,4 +101,11 @@ is_rollback_called() {
     is_rollback_called_ret=$?
     echo "rollback_called: ${is_rollback_called_ret}"
     return "$is_rollback_called_ret"
+}
+
+is_skipped_called() {
+    is_called "$skipped_called"
+    is_skipped_called_ret=$?
+    echo "skipped_called: ${is_skipped_called_ret}"
+    return "$is_skipped_called_ret"
 }

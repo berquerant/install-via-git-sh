@@ -56,6 +56,9 @@
 #     File to save commithash.
 #     The 7th argument of ivg_run() is preferentially referenced.
 #
+#   IVG_SKIPPED_COMMAND:
+#     Command to be executed when update is skipped.
+#
 # e.g.
 #
 # . install-via-git.sh
@@ -182,6 +185,7 @@ ivg_run() {
     __ivg_install_cmd="${5:-$IVG_INSTALL_COMMAND}"
     __ivg_rollback_cmd="${6:-$IVG_ROLLBACK_COMMAND}"
     __ivg_lockfile="${7:-$IVG_LOCKFILE}"
+    __ivg_skipped_cmd="$IVG_SKIPPED_COMMAND"
 
     if [ -z "$__ivg_repo" ]; then
         __ivg_error "${__ivg} requires $1 (repo)"
@@ -205,6 +209,9 @@ ivg_run() {
         if [ -n "$__ivg_lockfile" ]; then
            __ivg_ensure_overwrite "$1" "$__ivg_lockfile"
         fi
+    }
+    __ivg_do_skipped() {
+        __ivg_do "$__ivg_skipped_cmd"
     }
 
     __ivg_info "${__ivg} with"
@@ -299,9 +306,10 @@ ivg_run() {
     __ivg_setup() {
         __ivg_setup_internal
         __ivg_setup_ret=$?
-        if [ $__ivg_setup_ret -ne 0 ];  then
+        if [ $__ivg_setup_ret -ne 0 ]; then
             if __ivg_is_up_to_date ; then
                 __ivg_info "End setup, ${__ivg_repo} is already up to date."
+                __ivg_do_skipped
             else
                 __ivg_error "Setup ${__ivg_repo} failed!"
             fi

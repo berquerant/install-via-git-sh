@@ -57,6 +57,9 @@ Environment variables:
     File to save commithash.
     The 7th argument of ivg_run() is preferentially referenced.
 
+  IVG_SKIPPED_COMMAND:
+    Command to be executed when update is skipped.
+
 e.g.
 
 . install-via-git.sh
