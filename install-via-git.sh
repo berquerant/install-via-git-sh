@@ -41,11 +41,12 @@
 # ...
 #
 # ivg_run "https://github.com/USERNAME/path/to/repo.git" \ # required
-#        "reponame" \ # required
-#        "master" \   # branch, required, default is main
-#        "setup" \    # refer setup(), ignored if empty string
-#        "install" \  # refer install(), ignored if empty string
-#        "rollback"   # refer rollback(), ignored if empty string
+#         "reponame" \ # required
+#         "master" \   # branch, required, default is main
+#         "setup" \    # refer setup(), ignored if empty string
+#         "install" \  # refer install(), ignored if empty string
+#         "rollback" \ # refer rollback(), ignored if empty string
+#         "lockfile"   # file to save commithash, ignored if empty string
 #
 # then
 #
@@ -99,6 +100,15 @@ __ivg_mkdir() {
 __ivg_ensure_cd() {
     __ivg_mkdir -p "$1" && __ivg_cd "$1"
 }
+__ivg_touch() {
+    touch "$@"
+}
+__ivg_ensure_file() {
+    __ivg_mkdir -p "$(dirname $1)" && __ivg_touch "$1"
+}
+__ivg_ensure_overwrite() {
+    __ivg_ensure_file "$2" && echo "$1" > "$2"
+}
 
 __ivg_do() {
     if [ -n "$1" ]; then
@@ -143,6 +153,7 @@ ivg_run() {
     __ivg_setup_cmd="$4"
     __ivg_install_cmd="$5"
     __ivg_rollback_cmd="$6"
+    __ivg_lockfile="$7"
 
     if [ -z "$__ivg_repo" ]; then
         __ivg_error "${__ivg} requires $1 (repo)"
@@ -161,6 +172,11 @@ ivg_run() {
     }
     __ivg_do_rollback() {
         __ivg_do "$__ivg_rollback_cmd"
+    }
+    __ivg_save_commithash() {
+        if [ -n "$__ivg_lockfile" ]; then
+           __ivg_ensure_overwrite "$1" "$__ivg_lockfile"
+        fi
     }
 
     __ivg_info "${__ivg} with"
@@ -214,6 +230,7 @@ ivg_run() {
         __ivg_current_hash="$(__ivg_get_commit_hash)"
 
         __ivg_info "Now ${__ivg_repo} is ${__ivg_current_hash}"
+        __ivg_save_commithash "$__ivg_current_hash"
         __ivg_git_pull origin "$__ivg_branch"|| return $?
         __ivg_next_hash="$(__ivg_get_commit_hash)"
 
@@ -294,6 +311,7 @@ ivg_run() {
         __ivg_info "  repo: ${__ivg_repo}"
         __ivg_info "  old: ${__ivg_current_hash}"
         __ivg_info "  new: ${__ivg_next_hash}"
+        __ivg_save_commithash "$__ivg_next_hash"
     }
 
     __ivg_on_failure() {

@@ -42,11 +42,12 @@ rollback() {
 ...
 
 ivg_run "https://github.com/USERNAME/path/to/repo.git" \ # required
-       "reponame" \ # required
-       "master" \   # branch, required, default is main
-       "setup" \    # refer setup(), ignored if empty string
-       "install" \  # refer install(), ignored if empty string
-       "rollback"   # refer rollback(), ignored if empty string
+        "reponame" \ # required
+        "master" \   # branch, required, default is main
+        "setup" \    # refer setup(), ignored if empty string
+        "install" \  # refer install(), ignored if empty string
+        "rollback" \ # refer rollback(), ignored if empty string
+        "lockfile"   # file to save commithash, ignored if empty string
 
 then
 
