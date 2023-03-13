@@ -29,6 +29,7 @@ is_called() {
 git_clone_called=0
 git_pull_called=0
 git_checkout_called=0
+git_reset_called=0
 
 last_git_checkout_target=""
 
@@ -44,6 +45,10 @@ __ivg_git_checkout() {
     echo "__ivg_git_checkout $*"
     last_git_checkout_target="$1"
     git_checkout_called=$(( $git_checkout_called+1 ))
+}
+__ivg_git_reset() {
+    echo "__ivg_git_reset $*"
+    git_reset_called=$(( $git_reset_called+1 ))
 }
 
 is_git_clone_called() {
@@ -64,6 +69,11 @@ is_git_checkout_called() {
 is_last_git_checkout() {
     echo "last_git_checkout_target: ${last_git_checkout_target}"
     [ "$1" = "$last_git_checkout_target" ]
+}
+
+is_git_reset_called() {
+    echo "git_reset_called: ${git_reset_called}"
+    is_called "$git_reset_called" "$@"
 }
 
 setup_called=0

@@ -179,6 +179,9 @@ __ivg_git_pull() {
 __ivg_git_checkout() {
     __ivg_git checkout "$@"
 }
+__ivg_git_reset() {
+    __ivg_git reset "$@"
+}
 
 __ivg_default_workd="$PWD"
 # Return the working directory of ivg_run().
@@ -381,7 +384,9 @@ ivg_run() {
 
     __ivg_rollback_repo() {
         if __ivg_has_change ; then
-            __ivg_cd "$__ivg_targetd" && __ivg_git_checkout "$__ivg_current_hash" && __ivg_warn "Rolled back ${__ivg_repo} to ${__ivg_current_hash}"
+            __ivg_cd "$__ivg_targetd" &&\
+                __ivg_git_reset --hard "$__ivg_current_hash" &&\
+                __ivg_warn "Rolled back ${__ivg_repo} to ${__ivg_current_hash}"
         fi
     }
 
