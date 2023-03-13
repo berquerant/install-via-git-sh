@@ -21,7 +21,8 @@ __ivg_get_commit_hash() {
 }
 
 hashlockfile="/tmp/ivg.lock"
-rm -f "$hashlockfile"
+lockedhash="LOCKEDHASH"
+echo "$lockedhash" > "$hashlockfile"
 
 export IVG_REPOSITORY="REPO"
 export IVG_REPOSITORY_NAME="REPONAME"
@@ -30,13 +31,12 @@ export IVG_SETUP_COMMAND="setup"
 export IVG_INSTALL_COMMAND="install"
 export IVG_ROLLBACK_COMMAND="rollback"
 export IVG_LOCKFILE="$hashlockfile"
-
 ivg_run &&\
     ! is_git_clone_called &&\
     is_git_pull_called &&\
     is_git_checkout_called 1 &&\
+    is_last_git_checkout "$lockedhash" &&\
     is_setup_called &&\
     is_install_called &&\
     ! is_rollback_called &&\
-    [ -e "$__ivg_get_commit_hash_twice_stone" ] &&\
-    [ "$(cat $hashlockfile)" = "__ivg_get_commit_hash_latest" ]
+    [ -e "$__ivg_get_commit_hash_twice_stone" ]

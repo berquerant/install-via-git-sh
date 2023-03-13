@@ -41,7 +41,7 @@
 #     Commit to be installed. Default is the latest commit of IVG_BRANCH.
 #
 #   IVG_LOCKFILE:
-#     File to save commithash.
+#     File to save commithash. Treat this value as IVG_COMMIT when IVG_FORCE_UPDATE is not 0, or IVG_LOCKFILE exist and IVG_COMMIT is not specified.
 #
 #   IVG_SETUP_COMMAND:
 #     Setup command.
@@ -121,6 +121,9 @@ __ivg_debug() {
     fi
 }
 
+__ivg_file_not_empty() {
+    [ -s "$1" ]
+}
 __ivg_dir_exist() {
     [ -d "$1" ]
 }
@@ -217,6 +220,33 @@ ivg_run() {
         __ivg_do "$__ivg_skipped_cmd"
     }
 
+    __ivg_lockfile_not_empty() {
+        __ivg_file_not_empty "$__ivg_lockfile"
+    }
+
+    __ivg_read_lockfile=0
+    __ivg_is_read_lockfile() {
+        [ "$__ivg_read_lockfile" -eq 1 ]
+    }
+    __ivg_locked_commithash=""
+    if __ivg_lockfile_not_empty ; then
+        if ! __ivg_is_force_update ; then
+            __ivg_read_lockfile=1
+            __ivg_locked_commithash="$(cat $__ivg_lockfile)"
+        fi
+    fi
+
+    __ivg_install_target() {
+        if [ -n "$__ivg_commit" ]; then
+            echo "$__ivg_commit"
+        elif [ -n "$__ivg_locked_commithash" ] ; then
+            echo "$__ivg_locked_commithash"
+        else
+            echo "$__ivg_branch"
+        fi
+    }
+    __ivg_target="$(__ivg_install_target)"
+
     __ivg_info "${__ivg} with"
     __ivg_info "  repo: ${__ivg_repo}"
     __ivg_info "  reponame: ${__ivg_reponame}"
@@ -224,6 +254,9 @@ ivg_run() {
     __ivg_info "  setup_cmd: ${__ivg_setup_cmd}"
     __ivg_info "  install_cmd: ${__ivg_install_cmd}"
     __ivg_info "  rollback_cmd: ${__ivg_rollback_cmd}"
+    __ivg_info "  skipped_cmd: ${__ivg_skipped_cmd}"
+    __ivg_info "  lockfile: ${__ivg_lockfile}"
+    __ivg_info "  install target: ${__ivg_target}"
     __ivg_info "  working directory: ${__ivg_workd}"
 
     __ivg_targetd="${__ivg_workd}/${__ivg_reponame}"
@@ -267,17 +300,12 @@ ivg_run() {
         __ivg_cd "$__ivg_targetd" || return $?
         __ivg_current_hash="$(__ivg_get_commit_hash)"
         __ivg_info "Now ${__ivg_repo} is ${__ivg_current_hash}"
-        __ivg_save_commithash "$__ivg_current_hash"
 
         __ivg_pull() {
             __ivg_git_pull --prune --force origin "$__ivg_branch"
         }
         __ivg_checkout() {
-            if [ -z "$__ivg_commit" ]; then
-                __ivg_git_checkout "$__ivg_branch"
-            else
-                __ivg_git_checkout "$__ivg_commit"
-            fi
+            __ivg_git_checkout "$__ivg_target"
         }
 
         __ivg_pull && __ivg_checkout || return $?
@@ -302,6 +330,9 @@ ivg_run() {
         }
 
         if __ivg_is_changed ; then
+            if ! __ivg_is_read_lockfile ; then
+                __ivg_save_commithash "$__ivg_current_hash"
+            fi
             __ivg_info "Next ${__ivg_repo} will be ${__ivg_next_hash}"
             return 0
         fi

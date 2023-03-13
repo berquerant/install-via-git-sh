@@ -42,7 +42,7 @@ Environment variables:
     Commit to be installed. Default is the latest commit of IVG_BRANCH.
 
   IVG_LOCKFILE:
-    File to save commithash.
+    File to save commithash. Treat this value as IVG_COMMIT when IVG_FORCE_UPDATE is not 0, or IVG_LOCKFILE exist and IVG_COMMIT is not specified.
 
   IVG_SETUP_COMMAND:
     Setup command.
