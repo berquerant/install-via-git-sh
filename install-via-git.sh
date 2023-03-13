@@ -100,21 +100,32 @@ __ivg_loglevel2num() {
     esac
 }
 
+# colored echo
+#
+# $1: color
+# $2: message
 __ivg_echo() {
     tput setaf "$(__ivg_loglevel2num "$1")"
     echo "$2"
     tput sgr0  # clear attributes
 }
+
+# info log to stdout
 __ivg_info() {
     __ivg_echo info "$1"
 }
+
+# warn log to stdout
 __ivg_warn() {
     __ivg_echo warn "$1"
 }
+
+# error log to stderr
 __ivg_error() {
     __ivg_echo error "$1" 1>&2
 }
 
+# debug log to stderr
 __ivg_debug() {
     if [ "${IVG_DEBUG:-0}" -ne 0 ]; then
         echo "IVG_DEBUG: $*" 1>&2
@@ -146,6 +157,7 @@ __ivg_ensure_overwrite() {
     __ivg_ensure_file "$2" && echo "$1" > "$2"
 }
 
+# execute $1 if $1 is specified
 __ivg_do() {
     if [ -n "$1" ]; then
         "$1"
@@ -245,7 +257,7 @@ ivg_run() {
             echo "$__ivg_branch"
         fi
     }
-    __ivg_target="$(__ivg_install_target)"
+    __ivg_target="$(__ivg_install_target)" # commit hash or tag or branch
 
     __ivg_info "${__ivg} with"
     __ivg_info "  repo: ${__ivg_repo}"
@@ -267,8 +279,8 @@ ivg_run() {
         [ "$__ivg_current_hash" != "$__ivg_next_hash" ]
     }
 
-    __ivg_default_up_to_date=0 # diff exists
-    __ivg_up_to_date_up_to_date=1
+    __ivg_default_up_to_date=0 # diff exist
+    __ivg_up_to_date_up_to_date=1 # diff not exist
     __ivg_up_to_date="$__ivg_default_up_to_date"
     __ivg_set_up_to_date() {
         __ivg_up_to_date="$__ivg_up_to_date_up_to_date"
@@ -277,6 +289,10 @@ ivg_run() {
         [ "$__ivg_up_to_date" -eq "$__ivg_up_to_date_up_to_date" ]
     }
 
+    # clone or update repo, save the original commit hash to lockfile
+    # and determine if update is needed.
+    #
+    # __ivg_set_up_to_date() and return 1 if update is not needed
     __ivg_prepare_repo() {
         __ivg_info "Prepare ${__ivg_repo} into ${__ivg_targetd}"
         __ivg_ensure_cd "$__ivg_workd"
@@ -291,6 +307,7 @@ ivg_run() {
             [ "$__ivg_cloned" -eq "$__ivg_cloned_cloned" ]
         }
 
+        # git clone if the repo has not been cloned
         if ! __ivg_dir_exist "$__ivg_targetd" ; then
             __ivg_set_cloned
             __ivg_info "Download ${__ivg_repo}"
@@ -312,6 +329,7 @@ ivg_run() {
         __ivg_next_hash="$(__ivg_get_commit_hash)"
         __ivg_debug "commit: ${__ivg_current_hash} -> ${__ivg_next_hash}"
 
+        # compare the original hash of the repo and the hash after checkout
         __ivg_is_changed() {
             if __ivg_is_cloned ; then
                 __ivg_debug "__ivg_is_changed: cloned"
@@ -391,7 +409,7 @@ ivg_run() {
         __ivg_info "  repo: ${__ivg_repo}"
         __ivg_info "  old: ${__ivg_current_hash}"
         __ivg_info "  new: ${__ivg_next_hash}"
-        __ivg_save_commithash "$__ivg_next_hash"
+        __ivg_save_commithash "$__ivg_next_hash" # update lockfile
     }
 
     __ivg_on_failure() {
