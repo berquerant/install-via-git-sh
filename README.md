@@ -19,7 +19,7 @@ Environment variables:
     Default is $PWD.
 
   IVG_FORCE_UPDATE:
-    If 0, cancel installation when `git pull` does not update repo.
+    If 0, cancel installation when no update is required.
     Default is 0.
 
   IVG_DEBUG:
@@ -38,6 +38,12 @@ Environment variables:
   IVG_BRANCH:
     Branch name to be installed. Default is main.
 
+  IVG_COMMIT:
+    Commit to be installed. Default is the latest commit of IVG_BRANCH.
+
+  IVG_LOCKFILE:
+    File to save commithash.
+
   IVG_SETUP_COMMAND:
     Setup command.
 
@@ -46,9 +52,6 @@ Environment variables:
 
   IVG_ROLLBACK_COMMAND:
     Rollback command.
-
-  IVG_LOCKFILE:
-    File to save commithash.
 
   IVG_SKIPPED_COMMAND:
     Command to be executed when update is skipped.

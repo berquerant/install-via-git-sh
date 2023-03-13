@@ -18,7 +18,7 @@
 #     Default is $PWD.
 #
 #   IVG_FORCE_UPDATE:
-#     If 0, cancel installation when `git pull` does not update repo.
+#     If 0, cancel installation when no update is required.
 #     Default is 0.
 #
 #   IVG_DEBUG:
@@ -37,6 +37,12 @@
 #   IVG_BRANCH:
 #     Branch name to be installed. Default is main.
 #
+#   IVG_COMMIT:
+#     Commit to be installed. Default is the latest commit of IVG_BRANCH.
+#
+#   IVG_LOCKFILE:
+#     File to save commithash.
+#
 #   IVG_SETUP_COMMAND:
 #     Setup command.
 #
@@ -45,9 +51,6 @@
 #
 #   IVG_ROLLBACK_COMMAND:
 #     Rollback command.
-#
-#   IVG_LOCKFILE:
-#     File to save commithash.
 #
 #   IVG_SKIPPED_COMMAND:
 #     Command to be executed when update is skipped.
@@ -185,6 +188,7 @@ ivg_run() {
     __ivg_rollback_cmd="$IVG_ROLLBACK_COMMAND"
     __ivg_lockfile="$IVG_LOCKFILE"
     __ivg_skipped_cmd="$IVG_SKIPPED_COMMAND"
+    __ivg_commit="$IVG_COMMIT"
 
     if [ -z "$__ivg_repo" ]; then
         __ivg_error "${__ivg} requires $1 (repo)"
@@ -262,12 +266,22 @@ ivg_run() {
 
         __ivg_cd "$__ivg_targetd" || return $?
         __ivg_current_hash="$(__ivg_get_commit_hash)"
-
         __ivg_info "Now ${__ivg_repo} is ${__ivg_current_hash}"
         __ivg_save_commithash "$__ivg_current_hash"
-        __ivg_git_pull origin "$__ivg_branch"|| return $?
-        __ivg_next_hash="$(__ivg_get_commit_hash)"
 
+        __ivg_pull() {
+            __ivg_git_pull --prune --force origin "$__ivg_branch"
+        }
+        __ivg_checkout() {
+            if [ -z "$__ivg_commit" ]; then
+                __ivg_git_checkout "$__ivg_branch"
+            else
+                __ivg_git_checkout "$__ivg_commit"
+            fi
+        }
+
+        __ivg_pull && __ivg_checkout || return $?
+        __ivg_next_hash="$(__ivg_get_commit_hash)"
         __ivg_debug "commit: ${__ivg_current_hash} -> ${__ivg_next_hash}"
 
         __ivg_is_changed() {

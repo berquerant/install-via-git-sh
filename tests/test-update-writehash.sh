@@ -33,7 +33,7 @@ export IVG_LOCKFILE="$hashlockfile"
 ivg_run &&\
     ! is_git_clone_called &&\
     is_git_pull_called &&\
-    ! is_git_checkout_called &&\
+    is_git_checkout_called 1 &&\
     is_setup_called &&\
     is_install_called &&\
     ! is_rollback_called &&\

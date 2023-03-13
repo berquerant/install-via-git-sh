@@ -19,45 +19,51 @@ __ivg_get_commit_hash() {
 }
 
 is_called() {
-    [ "$1" = 1 ]
+    if [ -z "$2" ]; then
+        [ "$1" -gt 0 ]
+    else
+        [ "$1" -eq "$2" ]
+    fi
 }
 
 git_clone_called=0
 git_pull_called=0
 git_checkout_called=0
 
+last_git_checkout_target=""
+
 __ivg_git_clone() {
     echo "__ivg_git_clone $*"
-    git_clone_called=1
+    git_clone_called=$(( $git_clone_called+1 ))
 }
 __ivg_git_pull() {
     echo "__ivg_git_pull $*"
-    git_pull_called=1
+    git_pull_called=$(( $git_pull_called+1 ))
 }
 __ivg_git_checkout() {
     echo "__ivg_git_checkout $*"
-    git_checkout_called=1
+    last_git_checkout_target="$1"
+    git_checkout_called=$(( $git_checkout_called+1 ))
 }
 
 is_git_clone_called() {
-    is_called "$git_clone_called"
-    is_git_clone_called_ret=$?
-    echo "git_clone_called: ${is_git_clone_called_ret}"
-    return "$is_git_clone_called_ret"
+    echo "git_clone_called: ${git_clone_called}"
+    is_called "$git_clone_called" "$@"
 }
 
 is_git_pull_called() {
-    is_called "$git_pull_called"
-    is_git_pull_called_ret=$?
-    echo "git_pull_called: ${is_git_pull_called_ret}"
-    return "$is_git_pull_called_ret"
+    echo "git_pull_called: ${git_pull_called}"
+    is_called "$git_pull_called" "$@"
 }
 
 is_git_checkout_called() {
-    is_called "$git_checkout_called"
-    is_git_checkout_called_ret=$?
-    echo "git_checkout_called: ${is_git_checkout_called_ret}"
-    return "$is_git_checkout_called_ret"
+    echo "git_checkout_called: ${git_checkout_called}"
+    is_called "$git_checkout_called" "$@"
+}
+
+is_last_git_checkout() {
+    echo "last_git_checkout_target: ${last_git_checkout_target}"
+    [ "$1" = "$last_git_checkout_target" ]
 }
 
 setup_called=0
@@ -67,45 +73,37 @@ skipped_called=0
 
 setup() {
     echo "setup()"
-    setup_called=1
+    setup_called=$(( $setup_called+1 ))
 }
 install() {
     echo "install()"
-    install_called=1
+    install_called=$(($install_called+1 ))
 }
 rollback() {
     echo "rollback()"
-    rollback_called=1
+    rollback_called=$(( $rollback_called+1 ))
 }
 skipped() {
     echo "skipped()"
-    skipped_called=1
+    skipped_called=$(( $skipped_called+1 ))
 }
 
 is_setup_called() {
-    is_called "$setup_called"
-    is_setup_called_ret=$?
-    echo "setup_called: ${is_setup_called_ret}"
-    return "$is_setup_called_ret"
+    echo "setup_called: ${setup_called}"
+    is_called "$setup_called" "$@"
 }
 
 is_install_called() {
-    is_called "$install_called"
-    is_install_called_ret=$?
-    echo "install_called: ${is_install_called_ret}"
-    return "$is_install_called_ret"
+    echo "install_called: ${install_called}"
+    is_called "$install_called" "$@"
 }
 
 is_rollback_called() {
-    is_called "$rollback_called"
-    is_rollback_called_ret=$?
-    echo "rollback_called: ${is_rollback_called_ret}"
-    return "$is_rollback_called_ret"
+    echo "rollback_called: ${rollback_called}"
+    is_called "$rollback_called" "$@"
 }
 
 is_skipped_called() {
-    is_called "$skipped_called"
-    is_skipped_called_ret=$?
-    echo "skipped_called: ${is_skipped_called_ret}"
-    return "$is_skipped_called_ret"
+    echo "skipped_called: ${skipped_called}"
+    is_called "$skipped_called" "$@"
 }
