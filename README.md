@@ -30,32 +30,25 @@ Environment variables:
     git command.
 
   IVG_REPOSITORY:
-    Repository URI to be installed.
-    The 1st argument of ivg_run() is preferentially referenced.
+    Required. Repository URI to be installed.
 
   IVG_REPOSITORY_NAME:
-    Repository name to be installed.
-    The 2nd argument of ivg_run() is preferentially referenced.
+    Required. Repository name to be installed.
 
   IVG_BRANCH:
-    Branch name to be installed.
-    The 3rd argument of ivg_run() is preferentially referenced.
+    Branch name to be installed. Default is main.
 
   IVG_SETUP_COMMAND:
     Setup command.
-    The 4th argument of ivg_run() is preferentially referenced.
 
   IVG_INSTALL_COMMAND:
     Install command.
-    The 5th argument of ivg_run() is preferentially referenced.
 
   IVG_ROLLBACK_COMMAND:
     Rollback command.
-    The 6th argument of ivg_run() is preferentially referenced.
 
   IVG_LOCKFILE:
     File to save commithash.
-    The 7th argument of ivg_run() is preferentially referenced.
 
   IVG_SKIPPED_COMMAND:
     Command to be executed when update is skipped.
@@ -72,20 +65,26 @@ install() {
 rollback() {
 ...
 
-ivg_run "https://github.com/USERNAME/path/to/repo.git" \ # required
-        "reponame" \ # required
-        "master" \   # branch, required, default is main
-        "setup" \    # refer setup(), ignored if empty string
-        "install" \  # refer install(), ignored if empty string
-        "rollback" \ # refer rollback(), ignored if empty string
-        "lockfile"   # file to save commithash, ignored if empty string
+skipped() {
+...
+
+
+export IVG_REPOSITORY="https://github.com/USERNAME/path/to/repo.git"
+export IVG_REPOSITORY_NAME="reponame"
+export IVG_BRANCH="master"
+export IVG_SETUP_COMMAND="setup" # refer setup()
+export IVG_INSTALL_COMMAND="install" # refer install()
+export IVG_ROLLBACK_COMMAND="rollback" # refer rollback()
+export IVG_SKIPPED_COMMAND="skipped" # refer skipped()
+ivg_run
 
 then
 
 1. setup()
 2. git clone https://github.com/USERNAME/path/to/repo.git $IVG_WORKD/reponame
 3. git pull
-4. install()
+4. skipped() and exit when no update is required
+5. install()
 
 rollback repo and rollback() if errors are occurred.
 ```

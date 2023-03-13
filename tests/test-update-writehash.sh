@@ -23,13 +23,14 @@ __ivg_get_commit_hash() {
 hashlockfile="/tmp/ivg.lock"
 rm -f "$hashlockfile"
 
-ivg_run "REPO" \
-        "REPONAME" \
-        "main" \
-        "setup" \
-        "install" \
-        "rollback"\
-        "$hashlockfile" &&\
+export IVG_REPOSITORY="REPO"
+export IVG_REPOSITORY_NAME="REPONAME"
+export IVG_BRANCH="main"
+export IVG_SETUP_COMMAND="setup"
+export IVG_INSTALL_COMMAND="install"
+export IVG_ROLLBACK_COMMAND="rollback"
+export IVG_LOCKFILE="$hashlockfile"
+ivg_run &&\
     ! is_git_clone_called &&\
     is_git_pull_called &&\
     ! is_git_checkout_called &&\

@@ -12,8 +12,8 @@ install() {
     "${install_wd}/${reponame}/help-bash.sh" -h
 }
 
-ivg_run "$repo" \
-        "$reponame" \
-        "main" \
-        "" \
-        "install"
+export IVG_REPOSITORY="$repo"
+export IVG_REPOSITORY_NAME="$reponame"
+export IVG_BRANCH="main"
+export IVG_INSTALL_COMMAND="install"
+ivg_run
