@@ -20,7 +20,7 @@ jobs:
       - name: Describe Github Event Path
         run: cat $GITHUB_EVENT_PATH
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Display Bash version
         run: bash --version
       - name: Display Git version
